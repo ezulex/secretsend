@@ -24,15 +24,17 @@ public class SecretService {
     public Secret addSecret(Secret secret) {
         secret.setHashPhrase(UUID.randomUUID().toString());
 
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        if (!(secret.getPassword() == null)) {
+            MessageDigest digest = null;
+            try {
+                digest = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+            byte[] passwordHashBytes = digest.digest(secret.getPassword().getBytes(StandardCharsets.UTF_8));
+            String passwordHash = Base64.getEncoder().encodeToString(passwordHashBytes);
+            secret.setPassword(passwordHash);
         }
-        byte[] passwordHashBytes = digest.digest(secret.getPassword().getBytes(StandardCharsets.UTF_8));
-        String passwordHash = Base64.getEncoder().encodeToString(passwordHashBytes);
-        secret.setPassword(String.valueOf(passwordHash));
 
         return secretRepo.save(secret);
     }
