@@ -32,6 +32,7 @@ public class SecretResource {
     public ResponseEntity<Secret> getEmployeeById(@PathVariable("hashPhrase") String hashPhrase) {
         Secret secret = secretService.findSecretByHashPhrase(hashPhrase);
         if (secret.getPassword() == null) {
+            secretService.deleteSecret(hashPhrase);
             return new ResponseEntity<>(secret, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
@@ -39,12 +40,14 @@ public class SecretResource {
     }
 
     @GetMapping("/{hashPhrase}/{password}")
+    @Transactional
     public ResponseEntity<Secret> getEmployeeByIdWithPassword(
             @PathVariable("hashPhrase") String hashPhrase,
             @PathVariable("password") String password) {
         Secret secret = secretService.findSecretByHashPhrase(hashPhrase);
 
         if (secret.getPassword() == null) {
+            secretService.deleteSecret(hashPhrase);
             return new ResponseEntity<>(secret, HttpStatus.OK);
         } else {
             MessageDigest digest = null;
@@ -57,6 +60,7 @@ public class SecretResource {
             String passwordHash = Base64.getEncoder().encodeToString(passwordHashBytes);
 
             if (passwordHash.equals(secret.getPassword())) {
+                secretService.deleteSecret(hashPhrase);
                 return new ResponseEntity<>(secret, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
