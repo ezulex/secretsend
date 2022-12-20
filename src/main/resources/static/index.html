@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secret Send</title>
+</head>
+<body>
+<form id="sendSecret">
+    <label for="mySecret">Send me your secret:</label>
+    <input id="mySecret" name="secret">
+    <label for="mySecretPassword">Password:</label>
+    <input id="mySecretPassword" name="password">
+    <input type="submit" value="Secret Me!">
+</form>
+<div id="add-response"></div>
+
+<script>
+    window.addEventListener( "load", function () {
+        function sendData() {
+            let XHR = new XMLHttpRequest();
+
+            // Bind the FormData object and the form element
+            let formData = new FormData( form );
+
+            // Define what happens on successful data submission
+            XHR.addEventListener( "load", function(event) {
+                alert( event.target.responseText );
+                let divResponse = document.getElementById('add-response');
+                divResponse.textContent = "Ваш секрет добавлен!";
+            } );
+
+            // Define what happens in case of error
+            XHR.addEventListener( "error", function( event ) {
+                alert( 'Oops! Something went wrong.' );
+            } );
+
+            // Set up our request
+            XHR.open("POST", "http://localhost:8080/secret/add");
+            XHR.setRequestHeader('Content-Type', 'application/json');
+
+            console.log(formData);
+
+            let jsonObject = {};
+            formData.forEach(function(value, key){
+                jsonObject[key] = value;
+            });
+            let json = JSON.stringify(jsonObject);
+
+            console.log(json);
+            // The data sent is what the user provided in the form
+            XHR.send(json);
+        }
+
+        // Access the form element...
+        const form = document.getElementById( "sendSecret" );
+
+        // ...and take over its submit event.
+        form.addEventListener( "submit", function ( event ) {
+            event.preventDefault();
+
+            sendData();
+        } );
+    } );
+</script>
+</body>
+</html>

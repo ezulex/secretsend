@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secret Send</title>
+</head>
+<body>
+
+<form id="findSecret">
+  <label for="mySecretHashPhrase">HashPhrase:</label>
+  <input id="mySecretHashPhrase" name="hashPhrase">
+  <input type="submit" value="Show Me!">
+</form>
+
+<script>
+  window.addEventListener( "load", function () {
+    // Access the form element...
+    const form = document.getElementById( "findSecret" );
+
+    // ...and take over its submit event.
+    form.addEventListener( "submit", function ( event ) {
+      event.preventDefault();
+
+      let formData = new FormData( form );
+      const hPhrase = formData.get("hashPhrase");
+      console.log(hPhrase);
+      let XHR = new XMLHttpRequest();
+
+      XHR.addEventListener( "load", function(event) {
+        alert( event.target.responseText );
+      } );
+
+      // Define what happens in case of error
+      XHR.addEventListener( "error", function( event ) {
+        alert( 'Oops! Something went wrong.' );
+      } );
+
+      // Set up our request
+      XHR.open("GET", `http://localhost:8080/secret/${hPhrase}`);
+      // XHR.setRequestHeader('Content-Type', 'application/json');
+
+      // The data sent is what the user provided in the form
+      XHR.send();
+
+    } );
+  } );
+</script>
+</body>
+</html>

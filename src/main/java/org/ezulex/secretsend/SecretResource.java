@@ -29,6 +29,7 @@ public class SecretResource {
     }
 
     @GetMapping("/{hashPhrase}")
+    @Transactional
     public ResponseEntity<Secret> getEmployeeById(@PathVariable("hashPhrase") String hashPhrase) {
         Secret secret = secretService.findSecretByHashPhrase(hashPhrase);
         if (secret.getPassword() == null) {
